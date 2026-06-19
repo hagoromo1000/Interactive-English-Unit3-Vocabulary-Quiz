@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive English Unit 3 — Vocabulary Quiz</title>
+  <style>@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg: #0B0E1A;
+  --bg2: #111827;
+  --bg3: #1a2035;
+  --purple: #A855F7;
+  --cyan: #22D3EE;
+  --pink: #EC4899;
+  --gold: #F59E0B;
+  --text: #E2E8F0;
+  --text-dim: #94A3B8;
+  --correct: #34D399;
+  --wrong: #F87171;
+  --card-bg: rgba(255,255,255,0.04);
+  --card-border: rgba(168,85,247,0.2);
+  --radius: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== 背景の宇宙的グラデーション ===== */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(168,85,247,0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(34,211,238,0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 10%, rgba(236,72,153,0.08) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== 星の粒 ===== */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 40% 8%, rgba(255,255,255,0.9) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 60%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 25%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 85% 45%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 15% 70%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 80%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 35% 85%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 60% 90%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 5%, rgba(168,85,247,0.9) 0%, transparent 100%),
+    radial-gradient(1px 1px at 5% 50%, rgba(34,211,238,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 45% 55%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 65% 35%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 65%, rgba(255,255,255,0.8) 0%, transparent 100%);
+  animation: twinkle 5s ease-in-out infinite alternate;
+}
+@keyframes twinkle {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after { animation: none; }
+}
+
+/* ===== 画面管理 ===== */
+.screen { display: none; position: relative; z-index: 2; }
+.screen.active { display: block; }
+
+/* ===== ホーム画面 ===== */
+#screen-home {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 20px;
+}
+#screen-home.active { display: flex; }
+
+.home-header { text-align: center; margin-bottom: 40px; }
+.home-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(24px, 5vw, 38px);
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--purple), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 1px;
+  line-height: 1.3;
+}
+.home-unit {
+  font-size: 16px;
+  color: var(--text);
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
+.home-count {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  width: 100%;
+  max-width: 900px;
+}
+
+.mode-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: left;
+}
+.mode-card:hover { transform: translateY(-3px); border-color: var(--purple); box-shadow: 0 8px 28px rgba(168,85,247,0.18); }
+.mode-card:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+.mode-icon { font-size: 28px; margin-bottom: 10px; }
+.mode-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--purple);
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.mode-desc { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+
+.pattern-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+}
+.btn-pattern {
+  background: rgba(168,85,247,0.12);
+  border: 1px solid rgba(168,85,247,0.3);
+  border-radius: 8px;
+  color: var(--purple);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.5;
+  padding: 8px 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-pattern:hover { background: rgba(168,85,247,0.25); }
+.btn-pattern:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+/* ===== クイズ画面 ===== */
+#screen-quiz {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 20px 60px;
+}
+#screen-quiz.active { display: flex; }
+
+.quiz-header {
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.quiz-header-left { display: flex; align-items: center; gap: 16px; }
+.q-progress-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  color: var(--cyan);
+}
+.q-timer-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  color: var(--gold);
+}
+.btn-abort {
+  background: rgba(248,113,113,0.1);
+  border: 1px solid rgba(248,113,113,0.3);
+  border-radius: 10px;
+  color: var(--wrong);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-abort:hover { background: rgba(248,113,113,0.2); }
+.btn-abort:focus-visible { outline: 2px solid var(--wrong); outline-offset: 2px; }
+
+.progress-bar-wrap {
+  width: 100%;
+  max-width: 680px;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  margin-bottom: 22px;
+  overflow: hidden;
+}
+#q-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--purple), var(--cyan));
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.quiz-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 30px;
+  width: 100%;
+  max-width: 680px;
+  margin-bottom: 18px;
+}
+.pattern-badge {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--purple);
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  padding: 4px 12px;
+  background: rgba(168,85,247,0.1);
+  border: 1px solid rgba(168,85,247,0.3);
+  border-radius: 20px;
+  display: inline-block;
+}
+
+.instruction {
+  font-size: 13px;
+  color: var(--cyan);
+  background: rgba(34,211,238,0.06);
+  border: 1px solid rgba(34,211,238,0.2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+
+.compound-note {
+  font-size: 12px;
+  color: var(--gold);
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.25);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-top: 14px;
+  line-height: 1.6;
+}
+
+.quiz-img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+.def-text { font-size: 18px; color: var(--text); line-height: 1.6; }
+.def-text-ja { font-size: 13px; color: var(--text-dim); margin-top: 6px; line-height: 1.6; }
+.shuffled {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cyan);
+  letter-spacing: 6px;
+  margin-top: 16px;
+  word-break: break-all;
+}
+.p2-sentence { font-size: 16px; line-height: 1.8; color: var(--text); margin-top: 4px; }
+.p2-sentence-ja { font-size: 13px; color: var(--text-dim); margin-top: 8px; line-height: 1.7; }
+.blank { color: var(--gold); font-weight: 700; }
+
+.p3-hint { font-size: 16px; color: var(--text); line-height: 1.7; }
+.p3-hint-ja { font-size: 13px; color: var(--text-dim); margin-top: 6px; margin-bottom: 16px; line-height: 1.6; }
+.p3-blank {
+  font-size: 16px;
+  color: var(--text);
+  line-height: 1.8;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  border-left: 3px solid var(--cyan);
+}
+.p3-blank-ja { font-size: 13px; color: var(--text-dim); margin-top: 8px; line-height: 1.6; }
+
+.input-area { display: flex; gap: 10px; width: 100%; max-width: 680px; }
+#q-input {
+  flex: 1;
+  background: var(--bg3);
+  border: 1px solid rgba(168,85,247,0.3);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 16px;
+  font-family: 'Inter', sans-serif;
+  padding: 14px 18px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+#q-input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(168,85,247,0.12); }
+#q-input:disabled { opacity: 0.6; }
+
+#q-submit {
+  background: linear-gradient(135deg, var(--purple), var(--cyan));
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 14px 22px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+}
+#q-submit:hover { transform: scale(1.04); box-shadow: 0 4px 18px rgba(168,85,247,0.35); }
+#q-submit:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+/* ===== 解答解説パネル ===== */
+.feedback-area {
+  width: 100%;
+  max-width: 680px;
+  margin-top: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+}
+.feedback-result { font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+.feedback-result.correct { color: var(--correct); }
+.feedback-result.wrong { color: var(--wrong); }
+
+.explain-answer { font-size: 15px; color: var(--text); margin-bottom: 14px; }
+.explain-row { margin-bottom: 12px; font-size: 13px; line-height: 1.7; }
+.explain-label {
+  display: inline-block;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--cyan);
+  background: rgba(34,211,238,0.1);
+  border: 1px solid rgba(34,211,238,0.25);
+  border-radius: 6px;
+  padding: 2px 8px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.explain-row > span:not(.explain-label) { color: var(--text); }
+.explain-row .ja { color: var(--text-dim); }
+.related-list { margin: 6px 0 0 0; padding-left: 18px; color: var(--text-dim); }
+.related-list li { margin-bottom: 3px; }
+
+.btn-next {
+  margin-top: 16px;
+  width: 100%;
+  background: linear-gradient(135deg, var(--purple), var(--cyan));
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 14px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: transform 0.2s;
+}
+.btn-next:hover { transform: scale(1.02); }
+.btn-next:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+/* ===== 単語帳 ===== */
+#screen-flash {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+}
+#screen-flash.active { display: flex; }
+
+.flash-header {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.flash-counter { font-family: 'Orbitron', sans-serif; font-size: 13px; color: var(--cyan); }
+.flash-hint-text { font-size: 12px; color: var(--text-dim); margin-bottom: 18px; }
+
+.flash-card-wrap {
+  perspective: 1000px;
+  width: 100%;
+  max-width: 500px;
+  height: 260px;
+  cursor: pointer;
+  margin-bottom: 28px;
+}
+#flash-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease;
+}
+#flash-card.flipped { transform: rotateY(180deg); }
+.flash-face {
+  position: absolute;
+  inset: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  backface-visibility: hidden;
+  text-align: center;
+}
+.flash-back { transform: rotateY(180deg); }
+.flash-word { font-family: 'Orbitron', sans-serif; font-size: 30px; font-weight: 700; color: var(--purple); margin-bottom: 8px; }
+.flash-pos { font-family: 'Orbitron', sans-serif; font-size: 11px; color: var(--cyan); letter-spacing: 2px; }
+.flash-back-en { font-size: 16px; color: var(--text); line-height: 1.6; margin-bottom: 10px; }
+.flash-back-ja { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+
+.flash-controls { display: flex; gap: 16px; }
+.btn-flash-nav {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-flash-nav:hover { border-color: var(--purple); color: var(--purple); }
+.btn-flash-nav:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+/* ===== 結果画面 ===== */
+#screen-result {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+#screen-result.active { display: flex; }
+
+.result-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 40px;
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+.result-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  color: var(--purple);
+  letter-spacing: 2px;
+  margin-bottom: 22px;
+}
+.result-score-big {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 36px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--purple), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+.result-percent { font-size: 18px; color: var(--text-dim); margin-bottom: 14px; }
+.result-meta {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 18px;
+}
+#result-best { color: var(--gold); font-weight: 600; }
+
+.result-wrong-section { margin: 16px 0; text-align: left; }
+.wrong-label { font-size: 12px; color: var(--text-dim); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+.wrong-chip {
+  display: inline-block;
+  background: rgba(248,113,113,0.15);
+  border: 1px solid rgba(248,113,113,0.3);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 13px;
+  color: var(--wrong);
+  margin: 3px;
+}
+.perfect { color: var(--correct); font-family: 'Orbitron', sans-serif; font-size: 14px; letter-spacing: 1px; }
+
+.result-buttons { display: flex; gap: 12px; margin-top: 22px; flex-wrap: wrap; justify-content: center; }
+
+/* ===== 記録画面 ===== */
+#screen-history {
+  min-height: 100vh;
+  padding: 40px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+#screen-history.active { display: block; }
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.history-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 17px;
+  color: var(--purple);
+  letter-spacing: 1px;
+}
+
+.weak-section { margin-bottom: 28px; }
+.weak-title { font-size: 12px; color: var(--text-dim); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+.weak-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.weak-chip {
+  background: rgba(245,158,11,0.1);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 13px;
+  color: var(--gold);
+}
+.weak-count { color: var(--text-dim); font-size: 11px; }
+
+.history-item {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr 1fr 1fr;
+  gap: 12px;
+  padding: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  align-items: center;
+}
+.history-date { color: var(--text-dim); font-size: 13px; }
+.aborted-tag {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 10px;
+  color: var(--wrong);
+  background: rgba(248,113,113,0.12);
+  border-radius: 6px;
+  padding: 1px 6px;
+}
+.history-mode { color: var(--cyan); font-size: 13px; }
+.history-score { color: var(--text); font-weight: 600; }
+.history-pct { color: var(--purple); }
+.history-time { color: var(--gold); font-family: 'Orbitron', sans-serif; font-size: 12px; }
+.no-history { color: var(--text-dim); text-align: center; padding: 40px; }
+
+/* ===== 中断確認モーダル ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  padding: 20px;
+}
+.modal-box {
+  background: var(--bg2);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 32px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+}
+.modal-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+.modal-desc { font-size: 13px; color: var(--text-dim); margin-bottom: 24px; line-height: 1.6; }
+.modal-buttons { display: flex; flex-direction: column; gap: 10px; }
+
+/* ===== 共通ボタン ===== */
+.btn-primary {
+  background: linear-gradient(135deg, var(--purple), var(--cyan));
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 14px 24px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-primary:hover { transform: scale(1.04); box-shadow: 0 4px 18px rgba(168,85,247,0.35); }
+.btn-primary:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+.btn-secondary {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  color: var(--text);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 12px 20px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+.btn-secondary:hover { border-color: var(--purple); color: var(--purple); }
+.btn-secondary:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+.btn-danger {
+  background: rgba(248,113,113,0.1);
+  border: 1px solid rgba(248,113,113,0.3);
+  border-radius: 12px;
+  color: var(--wrong);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 12px 20px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+.btn-danger:hover { background: rgba(248,113,113,0.2); }
+.btn-danger:focus-visible { outline: 2px solid var(--wrong); outline-offset: 2px; }
+
+/* ===== レスポンシブ ===== */
+@media (max-width: 600px) {
+  .mode-grid { grid-template-columns: 1fr; }
+  .pattern-grid { grid-template-columns: repeat(2, 1fr); }
+  .history-item { grid-template-columns: 1fr 1fr; }
+  .quiz-card { padding: 20px; }
+  .result-card { padding: 26px; }
+  .result-meta { flex-direction: column; gap: 6px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== ホーム画面 ===== -->
+<div id="screen-home" class="screen active">
+  <div class="home-header">
+    <div class="home-title">Interactive English</div>
+    <div class="home-unit">Unit 3 Vocabulary Quiz</div>
+    <div class="home-count">20 words</div>
+  </div>
+
+  <div class="mode-grid">
+    <div class="mode-card" id="btn-mock">
+      <div class="mode-icon">📝</div>
+      <div class="mode-name">模擬小テスト</div>
+      <div class="mode-desc">20問・4パターン各5問・ランダム出題<br>本番形式で実力を確認</div>
+    </div>
+    <div class="mode-card" id="btn-flash">
+      <div class="mode-icon">🃏</div>
+      <div class="mode-name">単語帳</div>
+      <div class="mode-desc">フラッシュカード形式<br>単語・意味・日本語訳を確認</div>
+    </div>
+    <div class="mode-card" id="btn-timeattack">
+      <div class="mode-icon">⏱</div>
+      <div class="mode-name">タイムアタック</div>
+      <div class="mode-desc">20問をできるだけ速く解く<br>ベストタイムを更新しよう</div>
+    </div>
+    <div class="mode-card" id="btn-weak">
+      <div class="mode-icon">🎯</div>
+      <div class="mode-name">苦手単語集中</div>
+      <div class="mode-desc">間違えた単語だけを再出題<br>弱点を集中的に克服</div>
+    </div>
+    <div class="mode-card">
+      <div class="mode-icon">🔁</div>
+      <div class="mode-name">パターン別練習</div>
+      <div class="mode-desc">苦手なパターンを選んで練習</div>
+      <div class="pattern-grid">
+        <button class="btn-pattern" data-pattern="1">P1<br>並べ替え</button>
+        <button class="btn-pattern" data-pattern="2">P2<br>写真穴埋め</button>
+        <button class="btn-pattern" data-pattern="3">P3<br>英文穴埋め</button>
+        <button class="btn-pattern" data-pattern="4">P4<br>意味→単語</button>
+      </div>
+    </div>
+    <div class="mode-card" id="btn-history">
+      <div class="mode-icon">📊</div>
+      <div class="mode-name">学習記録</div>
+      <div class="mode-desc">過去の成績・タイムを確認<br>苦手単語ランキングも表示</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== クイズ画面 ===== -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-header">
+    <div class="quiz-header-left">
+      <span class="q-progress-text" id="q-progress">1 / 20</span>
+      <span class="q-timer-text" id="q-timer">00:00</span>
+    </div>
+    <button class="btn-abort" id="btn-abort">中断</button>
+  </div>
+  <div class="progress-bar-wrap">
+    <div id="q-progress-bar" style="width:5%"></div>
+  </div>
+  <div class="quiz-card">
+    <div class="pattern-badge" id="q-pattern">Pattern 1</div>
+    <div id="q-body"></div>
+    <div class="translation-box" id="q-translation"></div>
+  </div>
+  <div class="input-area">
+    <input type="text" id="q-input" placeholder="スペルを入力してEnterまたはCHECK" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <button id="q-submit">CHECK</button>
+  </div>
+  <div id="q-feedback-area" class="feedback-area" style="display:none">
+    <div class="feedback-result" id="q-feedback-result"></div>
+    <div class="feedback-detail" id="q-feedback-detail"></div>
+    <button class="btn-next" id="btn-next">次の問題 →</button>
+  </div>
+</div>
+
+<!-- ===== 単語帳画面 ===== -->
+<div id="screen-flash" class="screen">
+  <div class="flash-header">
+    <button class="btn-secondary btn-home">← ホーム</button>
+    <div class="flash-counter" id="flash-counter">1 / 20</div>
+    <div style="width:80px"></div>
+  </div>
+  <div class="flash-hint-text">カードをタップして意味を確認</div>
+  <div class="flash-card-wrap">
+    <div id="flash-card">
+      <div class="flash-face flash-front">
+        <div class="flash-word" id="flash-front-word">word</div>
+        <div class="flash-pos" id="flash-front-pos">adj.</div>
+      </div>
+      <div class="flash-face flash-back">
+        <div class="flash-back-en" id="flash-back-en">definition</div>
+        <div class="flash-back-ja" id="flash-back-ja">意味</div>
+      </div>
+    </div>
+  </div>
+  <div class="flash-controls">
+    <button class="btn-flash-nav" id="flash-prev">◀ 前へ</button>
+    <button class="btn-flash-nav" id="flash-next">次へ ▶</button>
+  </div>
+</div>
+
+<!-- ===== 結果画面 ===== -->
+<div id="screen-result" class="screen">
+  <div class="result-card">
+    <div class="result-title" id="result-title">テスト完了</div>
+    <div class="result-score-big" id="result-score">18 / 20</div>
+    <div class="result-percent" id="result-percent">90%</div>
+    <div class="result-meta">
+      <span>⏱ <span id="result-time">—</span></span>
+      <span id="result-best-wrap" style="display:none">🏆 Best: <span id="result-best">—</span></span>
+    </div>
+    <div class="result-wrong-section" id="result-wrong"></div>
+    <div class="result-buttons">
+      <button class="btn-primary" id="btn-retry">もう一度</button>
+      <button class="btn-secondary" id="btn-result-home">ホームへ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 記録画面 ===== -->
+<div id="screen-history" class="screen">
+  <div class="history-header">
+    <div class="history-title">📊 学習記録</div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn-danger" id="btn-clear-history">記録を消去</button>
+      <button class="btn-secondary btn-home">← ホーム</button>
+    </div>
+  </div>
+  <div id="weak-section" class="weak-section"></div>
+  <div id="history-list"></div>
+</div>
+
+<!-- ===== 中断確認モーダル ===== -->
+<div id="modal-abort" class="modal-overlay" style="display:none">
+  <div class="modal-box">
+    <div class="modal-title">テストを中断しますか？</div>
+    <div class="modal-desc">ここまでの結果は学習記録に保存されます。</div>
+    <div class="modal-buttons">
+      <button class="btn-danger" id="modal-confirm-abort">中断して記録する</button>
+      <button class="btn-secondary" id="modal-cancel-abort">続ける</button>
+    </div>
+  </div>
+</div>
+
+<script>const WORDS = [
+  {
+    word: "alone",
+    pos: "adj.",
+    definition: "by oneself; not with other people",
+    definitionJa: "ひとりで；他の人といない",
+    image: "images/alone.png",
+    p2sentence: "She was sitting ________ in her room, thinking about her friends.",
+    p2sentenceJa: "彼女は友達のことを考えながら、自分の部屋でひとりで座っていた。",
+    p3hint: "She felt a________ for the rest of the afternoon.",
+    p3hintJa: "彼女はその午後、ずっとひとりだと感じていた。",
+    p3blank: "My friend went home early, so I had no one to talk to.",
+    p3blankJa: "友達が早く帰ってしまい、話す相手がいなかった。",
+    p4definition: "by oneself; not with other people",
+    p4definitionJa: "ひとりで；他の人といない",
+    usageNote: "「alone」は感情を伴わない中立的な語で、「leave me alone（ひとりにして）」のように使う。寂しさを強調する場合は lonely を使う点に注意。",
+    related: ["lonely（寂しい・孤独な、感情が伴う形容詞）", "by myself（自分だけで、口語的な言い方）", "solitary（ひとりを好む・孤独な、文語的）"]
+  },
+  {
+    word: "annoyed",
+    pos: "adj.",
+    definition: "unhappy; a little angry",
+    definitionJa: "不機嫌な；少し腹を立てた",
+    image: "images/annoyed.png",
+    p2sentence: "He looked ________ because someone had eaten his lunch.",
+    p2sentenceJa: "誰かが彼のお弁当を食べてしまったので、彼は不機嫌そうな顔をしていた。",
+    p3hint: "She was really a________ at me.",
+    p3hintJa: "彼女は私に本当に腹を立てていた。",
+    p3blank: "I touched my sister's things without asking, and she got upset.",
+    p3blankJa: "断らずに妹のものを触ったら、彼女は怒ってしまった。",
+    p4definition: "unhappy; a little angry",
+    p4definitionJa: "不機嫌な；少し腹を立てた",
+    usageNote: "「annoyed」は「angry」より弱い怒りを表す。be annoyed at/with + 人、be annoyed about + こと、の形で使われる。",
+    related: ["angry（怒っている、より強い感情）", "irritated（イライラした、annoyedとほぼ同義）", "frustrated（思うようにいかずもどかしい）"]
+  },
+  {
+    word: "connected",
+    pos: "adj.",
+    definition: "feeling close (to someone)",
+    definitionJa: "（誰かと）つながっていると感じる",
+    image: "images/connected.png",
+    p2sentence: "After talking every day, they felt very ________ to each other.",
+    p2sentenceJa: "毎日話すうちに、ふたりはお互いにとても繋がっていると感じるようになった。",
+    p3hint: "Talking so often makes us feel c________ to each other.",
+    p3hintJa: "こんなに頻繁に話すと、お互いに繋がっていると感じるようになる。",
+    p3blank: "We chat online every day even though we live far apart.",
+    p3blankJa: "遠く離れて住んでいるのに、毎日オンラインでチャットしている。",
+    p4definition: "feeling close (to someone)",
+    p4definitionJa: "（誰かと）つながっていると感じる",
+    usageNote: "感情的な結びつきを表す場合は feel connected to ~ の形が多い。デジタル機器が「接続されている」という意味でも使う多義語。",
+    related: ["close（親しい、距離的・心理的に近い）", "bonded（絆で結ばれた）", "disconnected（切断された・疎遠な、反対語）"]
+  },
+  {
+    word: "convenient",
+    pos: "adj.",
+    definition: "easy to use or get",
+    definitionJa: "使いやすい；手に入りやすい",
+    image: "images/convenient.png",
+    p2sentence: "The app is very ________ because you can use it anywhere.",
+    p2sentenceJa: "そのアプリはどこでも使えるので、とても便利だ。",
+    p3hint: "It is very c________ for everyone to use.",
+    p3hintJa: "それは誰にとってもとても便利だ。",
+    p3blank: "The new app works on any phone and is easy to download.",
+    p3blankJa: "その新しいアプリはどのスマートフォンでも動き、簡単にダウンロードできる。",
+    p4definition: "easy to use or get",
+    p4definitionJa: "使いやすい；手に入りやすい",
+    usageNote: "名詞形は convenience（便利さ）。convenience store（コンビニ）のように複合語でも頻出する。",
+    related: ["convenience（便利さ、名詞形）", "handy（手軽な、口語的）", "accessible（利用しやすい・入手しやすい）"]
+  },
+  {
+    word: "crazy about",
+    pos: "adj. phr.",
+    definition: "liking someone or something a lot",
+    definitionJa: "〜に夢中である；〜が大好きだ",
+    image: "images/crazy-about.png",
+    p2sentence: "She is ________ this singer and knows all his songs.",
+    p2sentenceJa: "彼女はこの歌手に夢中で、彼の曲を全部知っている。",
+    p3hint: "He is c________ a________ basketball.",
+    p3hintJa: "彼はバスケットボールに夢中だ。",
+    p3blank: "My brother never misses a basketball game and has all the team's goods.",
+    p3blankJa: "弟はバスケの試合を一度も欠かさず見て、チームのグッズを全部持っている。",
+    p4definition: "liking someone or something a lot",
+    p4definitionJa: "〜に夢中である；〜が大好きだ",
+    usageNote: "be crazy about + 名詞 の形で使う熟語表現。対象は人にも物にも使える（例：crazy about her／crazy about soccer）。",
+    related: ["be into ~（〜にはまっている、口語的）", "be obsessed with ~（〜に執着している、より強い）", "be fond of ~（〜が好きだ、控えめな言い方）"]
+  },
+  {
+    word: "digital",
+    pos: "adj.",
+    definition: "using computer technology",
+    definitionJa: "コンピューター技術を使った；デジタルの",
+    image: "images/digital.png",
+    p2sentence: "We live in a ________ age where everything is on a screen.",
+    p2sentenceJa: "私たちは何もかもが画面上にあるデジタル時代に生きている。",
+    p3hint: "Our school life has become very d________.",
+    p3hintJa: "私たちの学校生活はとてもデジタル化された。",
+    p3blank: "We use tablets and apps for almost everything in school now.",
+    p3blankJa: "今や学校での授業のほぼすべてにタブレットやアプリを使っている。",
+    p4definition: "using computer technology",
+    p4definitionJa: "コンピューター技術を使った；デジタルの",
+    usageNote: "反対語は analog（アナログの）。digital camera、digital age など名詞を修飾する形でよく使われる。",
+    related: ["analog（アナログの、反対語）", "online（オンラインの）", "technological（技術的な）"]
+  },
+  {
+    word: "disagree",
+    pos: "v.",
+    definition: "to have a different opinion",
+    definitionJa: "意見が異なる；同意しない",
+    image: "images/disagree.png",
+    p2sentence: "The two friends often ________ about which sport is the best.",
+    p2sentenceJa: "ふたりの友達はどのスポーツが一番かについてよく意見が分かれる。",
+    p3hint: "We always d________ about which season is better.",
+    p3hintJa: "私たちはいつもどの季節がよいかについて意見が合わない。",
+    p3blank: "My friend thinks summer is the best season, but I think winter is.",
+    p3blankJa: "友達は夏が一番だと思っているが、私は冬だと思っている。",
+    p4definition: "to have a different opinion",
+    p4definitionJa: "意見が異なる；同意しない",
+    usageNote: "disagree with + 人/意見、disagree about + 話題 の形をとる。反対語は agree（同意する）。",
+    related: ["agree（同意する、反対語）", "argue（議論する・口論する）", "disagreement（意見の不一致、名詞形）"]
+  },
+  {
+    word: "global",
+    pos: "adj.",
+    definition: "relating to the whole world",
+    definitionJa: "世界全体に関わる；グローバルな",
+    image: "images/global.png",
+    p2sentence: "Climate change is a ________ problem we all need to solve.",
+    p2sentenceJa: "気候変動は私たち全員が解決しなければならない世界的な問題だ。",
+    p3hint: "It is a g________ problem that we all share.",
+    p3hintJa: "それは私たち全員が共有する世界的な問題だ。",
+    p3blank: "Air pollution does not stop at any country's border.",
+    p3blankJa: "大気汚染はどの国の国境でも止まらない。",
+    p4definition: "relating to the whole world",
+    p4definitionJa: "世界全体に関わる；グローバルな",
+    usageNote: "Academic Wordとして頻出。global warming（地球温暖化）、global economy（世界経済）のように使われる。",
+    related: ["worldwide（世界中で、副詞・形容詞）", "international（国際的な）", "local（地元の、対義語的に使われる）"]
+  },
+  {
+    word: "instrument",
+    pos: "n.",
+    definition: "a thing you use to make music, such as a guitar",
+    definitionJa: "楽器（ギターなど音楽を奏でるもの）",
+    image: "images/instrument.png",
+    p2sentence: "She played a beautiful ________ at the school concert.",
+    p2sentenceJa: "彼女は学校のコンサートで美しい楽器を演奏した。",
+    p3hint: "The violin is her favorite i________.",
+    p3hintJa: "バイオリンは彼女のお気に入りの楽器だ。",
+    p3blank: "She has been playing the violin since she was five years old.",
+    p3blankJa: "彼女は5歳からバイオリンを弾いている。",
+    p4definition: "a thing you use to make music, such as a guitar",
+    p4definitionJa: "楽器（ギターなど音楽を奏でるもの）",
+    usageNote: "musical instrument という形でも使われる。医療や科学で使う「器具」の意味も持つ多義語。",
+    related: ["musical instrument（楽器、正式な言い方）", "play an instrument（楽器を演奏する）", "tool（道具、より一般的な語）"]
+  },
+  {
+    word: "last",
+    pos: "adj.",
+    definition: "nearest in the past to the present time",
+    definitionJa: "最近の；直前の（過去の中で現在に一番近い）",
+    image: "images/last.png",
+    p2sentence: "Do you remember the ________ time we met?",
+    p2sentenceJa: "私たちが最後に会ったときのことを覚えていますか？",
+    p3hint: "When was the l________ time you called your grandparents?",
+    p3hintJa: "祖父母に電話したのは最後にいつでしたか？",
+    p3blank: "I cannot remember exactly when we first met at school.",
+    p3blankJa: "学校で初めて会ったのが正確にいつだったか思い出せない。",
+    p4definition: "nearest in the past to the present time",
+    p4definitionJa: "最近の；直前の（過去の中で現在に一番近い）",
+    usageNote: "last week／last year のように時を表す語の前に置く用法と、the last time（最後の時）という用法の両方を覚える。",
+    related: ["recent（最近の）", "previous（前の、ひとつ前を指す）", "final（最終的な、順序の最後を指す）"]
+  },
+  {
+    word: "loud",
+    pos: "adj.",
+    definition: "making a lot of sound or noise; not quiet",
+    definitionJa: "大きな音を出す；うるさい；静かでない",
+    image: "images/loud.png",
+    p2sentence: "The music from next door was so ________ that I couldn't sleep.",
+    p2sentenceJa: "隣から聞こえる音楽があまりにも大きくて、眠れなかった。",
+    p3hint: "The music was so l________ that I could not rest.",
+    p3hintJa: "音楽があまりに大きくて、休むことができなかった。",
+    p3blank: "The neighbors were having a party and the music was too strong to sleep through.",
+    p3blankJa: "隣人たちがパーティーをしていて、音楽が大きすぎて眠れなかった。",
+    p4definition: "making a lot of sound or noise; not quiet",
+    p4definitionJa: "大きな音を出す；うるさい；静かでない",
+    usageNote: "音量だけでなく、loud colors（派手な色）のように「目立つ・派手な」という意味でも使われる。",
+    related: ["noisy（騒がしい、loudと近い意味）", "quiet（静かな、反対語）", "volume（音量、名詞）"]
+  },
+  {
+    word: "memory",
+    pos: "n.",
+    definition: "something you remember from the past",
+    definitionJa: "過去の記憶；思い出",
+    image: "images/memory.png",
+    p2sentence: "Looking at old photos brings back happy ________.",
+    p2sentenceJa: "古い写真を見ると、幸せな思い出がよみがえる。",
+    p3hint: "Those photos are full of happy m________.",
+    p3hintJa: "あれらの写真は幸せな思い出でいっぱいだ。",
+    p3blank: "Looking at old photos brings back feelings from long ago.",
+    p3blankJa: "古い写真を見ると、昔の気持ちがよみがえってくる。",
+    p4definition: "something you remember from the past",
+    p4definitionJa: "過去の記憶；思い出",
+    usageNote: "可算名詞として「a memory（思い出のひとつ）」、不可算名詞として「memory（記憶力）」の両方の使い方がある。",
+    related: ["remember（覚えている、動詞形）", "memorize（記憶する・暗記する）", "nostalgia（懐かしさ）"]
+  },
+  {
+    word: "old-fashioned",
+    pos: "adj.",
+    definition: "not modern in style",
+    definitionJa: "流行遅れの；古風な",
+    image: "images/old-fashioned.png",
+    p2sentence: "My grandmother's sewing machine looks very ________.",
+    p2sentenceJa: "祖母のミシンはとても古風に見える。",
+    p3hint: "People say it looks very o________-f________.",
+    p3hintJa: "それはとても古風に見えると人々は言う。",
+    p3blank: "That style of dress was popular in the 1950s and looks nothing like today's fashion.",
+    p3blankJa: "そのドレスのスタイルは1950年代に流行したもので、現代のファッションとは全く異なる。",
+    p4definition: "not modern in style",
+    p4definitionJa: "流行遅れの；古風な",
+    usageNote: "ハイフンでつながる複合形容詞。否定的な意味だけでなく、「趣のある・伝統的な」という肯定的な文脈でも使われる。",
+    related: ["modern（現代的な、反対語）", "vintage（年代物の、肯定的な響き）", "outdated（時代遅れの、より否定的）"]
+  },
+  {
+    word: "percent",
+    pos: "n.",
+    definition: "one part in a hundred; %",
+    definitionJa: "パーセント；100分の1",
+    image: "images/percent.png",
+    p2sentence: "About 30 ________ of students walk to school.",
+    p2sentenceJa: "生徒の約30パーセントが徒歩で通学している。",
+    p3hint: "That means only ten p________ of the class passed.",
+    p3hintJa: "それはクラスのたった10パーセントしか合格しなかったことを意味する。",
+    p3blank: "Only two students out of twenty got a perfect score.",
+    p3blankJa: "20人中たった2人だけが満点を取った。",
+    p4definition: "one part in a hundred; %",
+    p4definitionJa: "パーセント；100分の1",
+    usageNote: "数字＋percent of＋名詞 の形で使う。文中では % の記号で書かれることも多い。",
+    related: ["percentage（割合、より一般的な名詞）", "ratio（比率）", "fraction（分数・一部）"]
+  },
+  {
+    word: "remind",
+    pos: "v.",
+    definition: "to make someone remember",
+    definitionJa: "（人に）思い出させる",
+    image: "images/remind.png",
+    p2sentence: "The smell of cookies always ________ me of my childhood.",
+    p2sentenceJa: "クッキーの香りはいつも私に子供の頃を思い出させる。",
+    p3hint: "It r________ me of the time I spent at her house.",
+    p3hintJa: "それは私に彼女の家で過ごした時間を思い出させる。",
+    p3blank: "The scent of my grandmother's cooking always brings her face to mind.",
+    p3blankJa: "祖母の料理の香りはいつも彼女の顔を思い起こさせる。",
+    p4definition: "to make someone remember",
+    p4definitionJa: "（人に）思い出させる",
+    usageNote: "remind 人 of 物事 の形が頻出（例：remind me of you）。remember（自分が覚えている）と混同しないよう注意。",
+    related: ["remember（覚えている、自動詞的）", "reminder（思い出させるもの・備忘録）", "recall（思い出す）"]
+  },
+  {
+    word: "spend",
+    pos: "v.",
+    definition: "to use time doing an activity",
+    definitionJa: "（時間を）〜して過ごす",
+    image: "images/spend.png",
+    p2sentence: "On weekends, I like to ________ time playing video games.",
+    p2sentenceJa: "週末は、ビデオゲームをして時間を過ごすのが好きだ。",
+    p3hint: "I s________ the whole day gaming.",
+    p3hintJa: "私は一日中ゲームをして過ごした。",
+    p3blank: "I played video games all Saturday without stopping.",
+    p3blankJa: "土曜日は止まらずに一日中ビデオゲームをした。",
+    p4definition: "to use time doing an activity",
+    p4definitionJa: "（時間を）〜して過ごす",
+    usageNote: "spend + 時間 + -ing の形で使う（例：spend time reading）。お金を使う場合も同じ動詞 spend を使う。",
+    related: ["spend money（お金を使う、同じ動詞の別用法）", "pass the time（時間をやり過ごす）", "waste（無駄に使う、否定的）"]
+  },
+  {
+    word: "stadium",
+    pos: "n.",
+    definition: "a very big building, often without a roof, for concerts or sports",
+    definitionJa: "スタジアム（コンサートやスポーツのための大きな建物）",
+    image: "images/stadium.png",
+    p2sentence: "The concert was held in a huge ________ downtown.",
+    p2sentenceJa: "コンサートは街の中心にある大きなスタジアムで開催された。",
+    p3hint: "It took place in a famous s________ in the city.",
+    p3hintJa: "それは市内の有名なスタジアムで行われた。",
+    p3blank: "The concert was held in a huge outdoor venue that fits thousands of people.",
+    p3blankJa: "コンサートは何千人もの人を収容できる大きな屋外会場で開催された。",
+    p4definition: "a very big building, often without a roof, for concerts or sports",
+    p4definitionJa: "スタジアム（コンサートやスポーツのための大きな建物）",
+    usageNote: "Academic Wordとして頻出。屋根がない大規模施設を指すことが多く、屋内施設には arena が使われる傾向がある。",
+    related: ["arena（屋内競技場）", "venue（会場、より一般的な語）", "field（競技場・フィールド）"]
+  },
+  {
+    word: "streaming",
+    pos: "adj.",
+    definition: "playing on a phone or computer while coming from the Internet",
+    definitionJa: "インターネットから受信しながら再生する；ストリーミングの",
+    image: "images/streaming.png",
+    p2sentence: "I was ________ the game on my phone during lunch.",
+    p2sentenceJa: "昼食中、スマートフォンでゲームをストリーミング再生していた。",
+    p3hint: "She was s________ the video on her way home.",
+    p3hintJa: "彼女は帰宅途中に動画をストリーミング再生していた。",
+    p3blank: "She was watching a show on her phone while downloading it at the same time.",
+    p3blankJa: "彼女はスマートフォンで番組を見ながら、同時にダウンロードしていた。",
+    p4definition: "playing on a phone or computer while coming from the Internet",
+    p4definitionJa: "インターネットから受信しながら再生する；ストリーミングの",
+    usageNote: "動詞 stream の現在分詞形でもあり、形容詞としても動詞としても使える（例：I'm streaming a movie）。",
+    related: ["download（ダウンロードする、対になる概念）", "broadcast（放送する）", "online（オンラインの）"]
+  },
+  {
+    word: "surprising",
+    pos: "adj.",
+    definition: "not expected; unusual",
+    definitionJa: "予期しない；驚くべき",
+    image: "images/surprising.png",
+    p2sentence: "It was ________ to see snow in April.",
+    p2sentenceJa: "4月に雪が見られるとは驚きだった。",
+    p3hint: "It was really s________ to see snow at that time of year.",
+    p3hintJa: "その時期に雪が見られるとは本当に驚きだった。",
+    p3blank: "Nobody expected it to snow in the middle of April.",
+    p3blankJa: "4月の中頃に雪が降るとは誰も予想していなかった。",
+    p4definition: "not expected; unusual",
+    p4definitionJa: "予期しない；驚くべき",
+    usageNote: "surprising（物事が人を驚かせる）と surprised（人が驚いている）の使い分けに注意。It is surprising that... の構文も頻出。",
+    related: ["surprised（驚いている、感情を表す形容詞）", "unexpected（予期しない）", "shocking（衝撃的な、より強い驚き）"]
+  },
+  {
+    word: "well-known",
+    pos: "adj.",
+    definition: "famous; known by many people",
+    definitionJa: "有名な；多くの人に知られている",
+    image: "images/well-known.png",
+    p2sentence: "This song is ________ all over the world.",
+    p2sentenceJa: "この曲は世界中で有名だ。",
+    p3hint: "She is w________-k________ around the globe.",
+    p3hintJa: "彼女は世界中で有名だ。",
+    p3blank: "This singer's name is recognized in almost every country in the world.",
+    p3blankJa: "この歌手の名前はほぼすべての国で知られている。",
+    p4definition: "famous; known by many people",
+    p4definitionJa: "有名な；多くの人に知られている",
+    usageNote: "ハイフンでつながる複合形容詞。well known（ハイフンなし）は be動詞の後で使う形で、名詞の前ではハイフンを入れる。",
+    related: ["famous（有名な、より一般的）", "popular（人気のある）", "renowned（名高い、より文語的）"]
+  }
+];
+</script>
+<script>const Storage = {
+  KEY_HISTORY: "quizHistory",
+  KEY_WRONG: "wrongWords",
+  KEY_BEST: "bestTime",
+
+  getHistory() {
+    try {
+      return JSON.parse(localStorage.getItem(this.KEY_HISTORY) || "[]");
+    } catch { return []; }
+  },
+
+  saveResult(mode, score, total, timeSeconds, wrongWords, aborted = false, totalAnswered = null) {
+    const answeredCount = totalAnswered !== null ? totalAnswered : total;
+    const history = this.getHistory();
+    history.unshift({
+      date: new Date().toLocaleDateString("ja-JP"),
+      mode,
+      score,
+      total,
+      totalAnswered: answeredCount,
+      percent: answeredCount > 0 ? Math.round((score / answeredCount) * 100) : 0,
+      timeSeconds,
+      wrongWords,
+      aborted
+    });
+    // 最大50件保持
+    if (history.length > 50) history.pop();
+    localStorage.setItem(this.KEY_HISTORY, JSON.stringify(history));
+
+    // タイムアタックのベスト記録更新（中断時は更新しない）
+    if (mode === "timeattack" && !aborted) {
+      const best = this.getBestTime();
+      if (best === null || timeSeconds < best) {
+        localStorage.setItem(this.KEY_BEST, timeSeconds);
+      }
+    }
+
+    // 苦手単語更新
+    this.updateWrongWords(wrongWords);
+  },
+
+  updateWrongWords(wrongWords) {
+    const current = this.getWrongWords();
+    wrongWords.forEach(w => {
+      current[w] = (current[w] || 0) + 1;
+    });
+    // 正解した単語はカウントを1減らす（全問正解でない単語のみ）
+    localStorage.setItem(this.KEY_WRONG, JSON.stringify(current));
+  },
+
+  getWrongWords() {
+    try {
+      return JSON.parse(localStorage.getItem(this.KEY_WRONG) || "{}");
+    } catch { return {}; }
+  },
+
+  getBestTime() {
+    const v = localStorage.getItem(this.KEY_BEST);
+    return v !== null ? parseInt(v) : null;
+  },
+
+  clearAll() {
+    localStorage.removeItem(this.KEY_HISTORY);
+    localStorage.removeItem(this.KEY_WRONG);
+    localStorage.removeItem(this.KEY_BEST);
+  },
+
+  formatTime(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return m > 0 ? `${m}分${s}秒` : `${s}秒`;
+  }
+};
+</script>
+<script>// ===== ユーティリティ =====
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function shuffleLetters(part) {
+  const letters = part.toUpperCase().split("");
+  let shuffled;
+  do { shuffled = shuffle(letters); }
+  while (shuffled.join("") === letters.join("") && letters.length > 1);
+  return shuffled.join("");
+}
+
+// old-fashioned / well-known / crazy about のような複数部分の単語かどうか
+function getWordParts(word) {
+  if (word.includes("-")) return word.split("-");
+  if (word.includes(" ")) return word.split(" ");
+  return null; // 単一語
+}
+
+function shuffleWord(word) {
+  const parts = getWordParts(word);
+  if (parts) {
+    // 複合語：各部分を別々にシャッフルして並べて表示
+    return parts.map(shuffleLetters).join("  /  ");
+  }
+  return shuffleLetters(word);
+}
+
+// 正解判定：複合語はカンマ区切り、カンマ前後の空白は許容、大文字小文字無視
+function isAnswerCorrect(input, word) {
+  const parts = getWordParts(word);
+  const normalize = s => s.trim().toLowerCase();
+  if (parts) {
+    const expected = parts.map(p => normalize(p)).join(",");
+    const given = input.split(",").map(normalize).join(",");
+    return given === expected;
+  }
+  return normalize(input) === normalize(word);
+}
+
+// 解答欄に表示するプレースホルダー
+function inputPlaceholder(word) {
+  const parts = getWordParts(word);
+  if (parts) {
+    return `${parts.map(() => "つづり").join(",")} の形でカンマ区切りで入力`;
+  }
+  return "スペルを入力してください";
+}
+
+function relatedListHTML(related) {
+  if (!related || related.length === 0) return "";
+  return `<ul class="related-list">${related.map(r => `<li>${r}</li>`).join("")}</ul>`;
+}
+
+// ===== アプリ状態 =====
+const App = {
+  mode: null,
+  questions: [],
+  current: 0,
+  score: 0,
+  wrongWords: [],
+  startTime: null,
+  timerInterval: null,
+  elapsed: 0,
+  patternFilter: null,
+  answered: false
+};
+
+// ===== 問題生成 =====
+function generateQuestion(wordObj, pattern) {
+  switch (pattern) {
+    case 1: return generateP1(wordObj);
+    case 2: return generateP2(wordObj);
+    case 3: return generateP3(wordObj);
+    case 4: return generateP4(wordObj);
+  }
+}
+
+function generateP1(w) {
+  const parts = getWordParts(w.word);
+  const compoundNote = parts ? `<div class="compound-note">※ ${parts.length}つの部分に分かれています。カンマ（,）で区切って入力してください。</div>` : "";
+  return {
+    word: w.word, pattern: 1, data: w,
+    prompt: `
+      <div class="instruction">次の意味を表す英単語になるように、アルファベットを並べ替えて入力してください。</div>
+      <div class="def-text">${w.definition}</div>
+      <div class="def-text-ja">${w.definitionJa}</div>
+      <div class="shuffled">${shuffleWord(w.word)}</div>
+      ${compoundNote}
+    `,
+    answer: w.word
+  };
+}
+
+
+function generateP2(w) {
+  const parts = getWordParts(w.word);
+  const compoundNote = parts ? `<div class="compound-note">※ この単語は${parts.length}つの部分（${parts.join(" + ")}）からできています。カンマ（,）で区切って入力してください。</div>` : "";
+  return {
+    word: w.word, pattern: 2, data: w,
+    prompt: `
+      <div class="instruction">空欄に当てはまる英単語を入力してください。</div>
+      <div class="p2-sentence">${w.p2sentence.replace("________", '<span class="blank">________</span>')}</div>
+      <div class="p2-sentence-ja">${w.p2sentenceJa}</div>
+      ${compoundNote}
+    `,
+    answer: w.word
+  };
+}
+
+function generateP3(w) {
+  const parts = getWordParts(w.word);
+  const compoundNote = parts
+    ? `<div class="compound-note">※ この単語は${parts.length}つの部分に分かれて表示されています。カンマ（,）で区切ってそれぞれのつづりを入力してください（例：${parts.map(() => "xxxxx").join(",")}）。</div>`
+    : "";
+  return {
+    word: w.word, pattern: 3, data: w,
+    prompt: `
+      <div class="instruction">2つの英文を読み、下の英文の空欄（頭文字のみ表示）に当てはまる英単語のつづりを最後まで入力してください。</div>
+      <div class="p3-hint">${w.p3blank}</div>
+      <div class="p3-hint-ja">${w.p3blankJa}</div>
+      <div class="p3-blank">${w.p3hint}</div>
+      <div class="p3-blank-ja">${w.p3hintJa}</div>
+      ${compoundNote}
+    `,
+    answer: w.word
+  };
+}
+
+function generateP4(w) {
+  const parts = getWordParts(w.word);
+  const compoundNote = parts ? `<div class="compound-note">※ この単語は${parts.length}つの部分（${parts.join(" + ")}）からできています。カンマ（,）で区切って入力してください。</div>` : "";
+  return {
+    word: w.word, pattern: 4, data: w,
+    prompt: `
+      <div class="instruction">意味に当てはまる英単語を入力してください。</div>
+      <div class="def-text">${w.p4definition}</div>
+      <div class="def-text-ja">${w.p4definitionJa}</div>
+      ${compoundNote}
+    `,
+    answer: w.word
+  };
+}
+
+// ===== 模擬小テスト用：各パターン5問ずつ =====
+function buildMockQuestions() {
+  const words = shuffle(WORDS);
+  const questions = [];
+  for (let p = 1; p <= 4; p++) {
+    const slice = words.slice((p - 1) * 5, p * 5);
+    slice.forEach(w => questions.push(generateQuestion(w, p)));
+  }
+  return shuffle(questions);
+}
+
+// ===== パターン別練習用 =====
+function buildPatternQuestions(pattern) {
+  return shuffle(WORDS).map(w => generateQuestion(w, pattern));
+}
+
+// ===== 苦手単語モード =====
+function buildWeakQuestions() {
+  const wrong = Storage.getWrongWords();
+  const entries = Object.entries(wrong).sort((a, b) => b[1] - a[1]);
+  if (entries.length === 0) return [];
+  const topWords = entries.slice(0, 10).map(([word]) => word);
+  const wordObjs = topWords.map(w => WORDS.find(x => x.word === w)).filter(Boolean);
+  return shuffle(wordObjs).map(w => generateQuestion(w, Math.ceil(Math.random() * 4)));
+}
+
+// ===== タイムアタック =====
+function buildTimeAttackQuestions() {
+  return buildMockQuestions();
+}
+
+// ===== 画面遷移 =====
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+// ===== タイマー =====
+function startTimer(displayId) {
+  App.startTime = Date.now();
+  App.elapsed = 0;
+  App.timerInterval = setInterval(() => {
+    App.elapsed = Math.floor((Date.now() - App.startTime) / 1000);
+    const el = document.getElementById(displayId);
+    if (el) el.textContent = Storage.formatTime(App.elapsed);
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(App.timerInterval);
+  App.timerInterval = null;
+}
+
+// ===== 問題表示 =====
+function showQuestion() {
+  const q = App.questions[App.current];
+  const total = App.questions.length;
+  App.answered = false;
+
+  document.getElementById("q-progress").textContent = `${App.current + 1} / ${total}`;
+  document.getElementById("q-progress-bar").style.width = `${((App.current + 1) / total) * 100}%`;
+  document.getElementById("q-pattern").textContent = `Pattern ${q.pattern}`;
+  document.getElementById("q-body").innerHTML = q.prompt;
+  const inputEl = document.getElementById("q-input");
+  inputEl.value = "";
+  inputEl.disabled = false;
+  inputEl.placeholder = inputPlaceholder(q.answer);
+  inputEl.focus();
+
+  document.getElementById("q-feedback-area").style.display = "none";
+  document.getElementById("q-submit").style.display = "inline-block";
+}
+
+// ===== 解答解説パネル =====
+function buildExplanation(q, isCorrect, userInput) {
+  const w = q.data;
+  const resultEl = document.getElementById("q-feedback-result");
+  resultEl.textContent = isCorrect ? "✓ 正解です！" : `✗ 不正解（あなたの解答：${userInput || "（未入力）"}）`;
+  resultEl.className = "feedback-result " + (isCorrect ? "correct" : "wrong");
+
+  const parts = getWordParts(w.word);
+  const correctDisplay = parts ? parts.join(" , ") : w.word;
+
+  document.getElementById("q-feedback-detail").innerHTML = `
+    <div class="explain-answer">正解：<strong>${correctDisplay}</strong>${parts ? ` （${w.word}）` : ""}</div>
+    <div class="explain-row">
+      <span class="explain-label">定義</span>
+      <span>${w.definition}<br><span class="ja">${w.definitionJa}</span></span>
+    </div>
+    <div class="explain-row">
+      <span class="explain-label">使い方</span>
+      <span>${w.usageNote}</span>
+    </div>
+    <div class="explain-row">
+      <span class="explain-label">関連語</span>
+      ${relatedListHTML(w.related)}
+    </div>
+  `;
+}
+
+// ===== 回答チェック =====
+function checkAnswer() {
+  if (App.answered) return;
+  const q = App.questions[App.current];
+  const inputEl = document.getElementById("q-input");
+  const rawInput = inputEl.value.trim();
+  const isCorrect = isAnswerCorrect(rawInput, q.answer);
+
+  App.answered = true;
+  inputEl.disabled = true;
+  document.getElementById("q-submit").style.display = "none";
+
+  if (isCorrect) {
+    App.score++;
+  } else {
+    if (!App.wrongWords.includes(q.word)) App.wrongWords.push(q.word);
+  }
+
+  buildExplanation(q, isCorrect, rawInput);
+  document.getElementById("q-feedback-area").style.display = "block";
+}
+
+function nextQuestion() {
+  App.current++;
+  if (App.current >= App.questions.length) {
+    finishQuiz(false);
+  } else {
+    showQuestion();
+  }
+}
+
+// ===== 結果表示 =====
+function finishQuiz(aborted) {
+  stopTimer();
+  const totalAnswered = aborted ? App.current : App.questions.length;
+  Storage.saveResult(App.mode, App.score, App.questions.length, App.elapsed, App.wrongWords, aborted, totalAnswered);
+
+  const pct = App.questions.length > 0 ? Math.round((App.score / (aborted ? Math.max(totalAnswered,1) : App.questions.length)) * 100) : 0;
+
+  document.getElementById("result-title").textContent = aborted ? "テスト中断（記録済み）" : "テスト完了";
+  document.getElementById("result-score").textContent = aborted
+    ? `${App.score} / ${totalAnswered}（中断・全${App.questions.length}問中）`
+    : `${App.score} / ${App.questions.length}`;
+  document.getElementById("result-percent").textContent = `${pct}%`;
+  document.getElementById("result-time").textContent = Storage.formatTime(App.elapsed);
+
+  const wrongEl = document.getElementById("result-wrong");
+  if (App.wrongWords.length === 0) {
+    wrongEl.innerHTML = totalAnswered > 0 ? "<span class='perfect'>Perfect! 全問正解！</span>" : "";
+  } else {
+    wrongEl.innerHTML = "<div class='wrong-label'>間違えた単語</div>" +
+      App.wrongWords.map(w => `<span class="wrong-chip">${w}</span>`).join("");
+  }
+
+  const bestWrap = document.getElementById("result-best-wrap");
+  if (App.mode === "timeattack" && !aborted) {
+    const best = Storage.getBestTime();
+    document.getElementById("result-best").textContent = best !== null ? Storage.formatTime(best) : "—";
+    bestWrap.style.display = "inline";
+  } else {
+    bestWrap.style.display = "none";
+  }
+
+  showScreen("screen-result");
+}
+
+// ===== 単語帳モード =====
+let flashIndex = 0;
+
+function showFlashCard() {
+  const w = WORDS[flashIndex];
+  document.getElementById("flash-counter").textContent = `${flashIndex + 1} / ${WORDS.length}`;
+  document.getElementById("flash-front-word").textContent = w.word;
+  document.getElementById("flash-front-pos").textContent = w.pos;
+  document.getElementById("flash-back-en").textContent = w.definition;
+  document.getElementById("flash-back-ja").textContent = w.definitionJa;
+  document.getElementById("flash-card").classList.remove("flipped");
+}
+
+// ===== 学習記録画面 =====
+function renderHistory() {
+  const history = Storage.getHistory();
+  const el = document.getElementById("history-list");
+  const modeLabels = {
+    mock: "模擬小テスト",
+    pattern: "パターン練習",
+    weak: "苦手単語",
+    timeattack: "タイムアタック"
+  };
+
+  if (history.length === 0) {
+    el.innerHTML = "<div class='no-history'>まだ記録がありません</div>";
+  } else {
+    el.innerHTML = history.map(h => `
+      <div class="history-item">
+        <div class="history-date">${h.date}${h.aborted ? '<span class="aborted-tag">中断</span>' : ''}</div>
+        <div class="history-mode">${modeLabels[h.mode] || h.mode}</div>
+        <div class="history-score">${h.score}/${h.totalAnswered ?? h.total} <span class="history-pct">${h.percent}%</span></div>
+        <div class="history-time">${Storage.formatTime(h.timeSeconds)}</div>
+      </div>
+    `).join("");
+  }
+
+  // 苦手単語ランキング
+  const wrong = Storage.getWrongWords();
+  const entries = Object.entries(wrong).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const weakEl = document.getElementById("weak-section");
+  if (entries.length === 0) {
+    weakEl.innerHTML = "";
+  } else {
+    weakEl.innerHTML = `
+      <div class="weak-title">よく間違える単語</div>
+      <div class="weak-chips">
+        ${entries.map(([w, c]) => `<span class="weak-chip">${w} <span class="weak-count">×${c}</span></span>`).join("")}
+      </div>
+    `;
+  }
+}
+
+// ===== モード開始 =====
+function startMode(mode) {
+  App.mode = mode;
+  App.current = 0;
+  App.score = 0;
+  App.wrongWords = [];
+  App.elapsed = 0;
+
+  if (mode === "flashcard") {
+    flashIndex = 0;
+    showScreen("screen-flash");
+    showFlashCard();
+    return;
+  }
+
+  if (mode === "mock") App.questions = buildMockQuestions();
+  else if (mode === "pattern") App.questions = buildPatternQuestions(App.patternFilter || 1);
+  else if (mode === "weak") {
+    App.questions = buildWeakQuestions();
+    if (App.questions.length === 0) {
+      alert("まだ苦手単語の記録がありません。他のモードで練習してください。");
+      return;
+    }
+  }
+  else if (mode === "timeattack") App.questions = buildTimeAttackQuestions();
+
+  showScreen("screen-quiz");
+  startTimer("q-timer");
+  showQuestion();
+}
+
+// ===== 中断処理 =====
+function openAbortModal() {
+  document.getElementById("modal-abort").style.display = "flex";
+}
+function closeAbortModal() {
+  document.getElementById("modal-abort").style.display = "none";
+}
+function confirmAbort() {
+  closeAbortModal();
+  finishQuiz(true);
+}
+
+// ===== イベント設定 =====
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("btn-mock").onclick = () => startMode("mock");
+  document.getElementById("btn-flash").onclick = () => startMode("flashcard");
+  document.getElementById("btn-timeattack").onclick = () => startMode("timeattack");
+  document.getElementById("btn-weak").onclick = () => startMode("weak");
+  document.getElementById("btn-history").onclick = () => {
+    renderHistory();
+    showScreen("screen-history");
+  };
+
+  document.querySelectorAll(".btn-pattern").forEach(btn => {
+    btn.onclick = () => {
+      App.patternFilter = parseInt(btn.dataset.pattern);
+      startMode("pattern");
+    };
+  });
+
+  document.getElementById("q-submit").onclick = checkAnswer;
+  document.getElementById("q-input").addEventListener("keydown", e => {
+    if (e.key === "Enter") checkAnswer();
+  });
+  document.getElementById("btn-next").onclick = nextQuestion;
+
+  // 中断ボタン
+  document.getElementById("btn-abort").onclick = openAbortModal;
+  document.getElementById("modal-cancel-abort").onclick = closeAbortModal;
+  document.getElementById("modal-confirm-abort").onclick = confirmAbort;
+
+  // 単語帳操作
+  document.getElementById("flash-card").onclick = () => {
+    document.getElementById("flash-card").classList.toggle("flipped");
+  };
+  document.getElementById("flash-prev").onclick = () => {
+    flashIndex = (flashIndex - 1 + WORDS.length) % WORDS.length;
+    showFlashCard();
+  };
+  document.getElementById("flash-next").onclick = () => {
+    flashIndex = (flashIndex + 1) % WORDS.length;
+    showFlashCard();
+  };
+
+  document.querySelectorAll(".btn-home").forEach(btn => {
+    btn.onclick = () => {
+      stopTimer();
+      showScreen("screen-home");
+    };
+  });
+
+  document.getElementById("btn-retry").onclick = () => startMode(App.mode);
+  document.getElementById("btn-result-home").onclick = () => showScreen("screen-home");
+
+  document.getElementById("btn-clear-history").onclick = () => {
+    if (confirm("学習記録をすべて削除しますか？")) {
+      Storage.clearAll();
+      renderHistory();
+    }
+  };
+});
+</script>
+</body>
+</html>
