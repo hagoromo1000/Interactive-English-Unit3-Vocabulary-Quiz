@@ -90,7 +90,6 @@ function generateP1(w) {
     prompt: `
       <div class="instruction">次の意味を表す英単語になるように、アルファベットを並べ替えて入力してください。</div>
       <div class="def-text">${w.definition}</div>
-      <div class="def-text-ja">${w.definitionJa}</div>
       <div class="shuffled">${shuffleWord(w.word)}</div>
       ${compoundNote}
     `,
@@ -107,7 +106,6 @@ function generateP2(w) {
     prompt: `
       <div class="instruction">空欄に当てはまる英単語を入力してください。</div>
       <div class="p2-sentence">${w.p2sentence.replace("________", '<span class="blank">________</span>')}</div>
-      <div class="p2-sentence-ja">${w.p2sentenceJa}</div>
       ${compoundNote}
     `,
     answer: w.word
@@ -124,9 +122,7 @@ function generateP3(w) {
     prompt: `
       <div class="instruction">2つの英文を読み、下の英文の空欄（頭文字のみ表示）に当てはまる英単語のつづりを最後まで入力してください。</div>
       <div class="p3-hint">${w.p3blank}</div>
-      <div class="p3-hint-ja">${w.p3blankJa}</div>
       <div class="p3-blank">${w.p3hint}</div>
-      <div class="p3-blank-ja">${w.p3hintJa}</div>
       ${compoundNote}
     `,
     answer: w.word
@@ -141,7 +137,6 @@ function generateP4(w) {
     prompt: `
       <div class="instruction">意味に当てはまる英単語を入力してください。</div>
       <div class="def-text">${w.p4definition}</div>
-      <div class="def-text-ja">${w.p4definitionJa}</div>
       ${compoundNote}
     `,
     answer: w.word
@@ -231,12 +226,21 @@ function buildExplanation(q, isCorrect, userInput) {
   const parts = getWordParts(w.word);
   const correctDisplay = parts ? parts.join(" , ") : w.word;
 
+  // パターンごとの出題文和訳
+  let sentenceJaHTML = "";
+  if (q.pattern === 2) {
+    sentenceJaHTML = `<div class="explain-row"><span class="explain-label">出題文和訳</span><span class="ja">${w.p2sentenceJa}</span></div>`;
+  } else if (q.pattern === 3) {
+    sentenceJaHTML = `<div class="explain-row"><span class="explain-label">出題文和訳</span><span class="ja">${w.p3blankJa}<br>${w.p3hintJa}</span></div>`;
+  }
+
   document.getElementById("q-feedback-detail").innerHTML = `
     <div class="explain-answer">正解：<strong>${correctDisplay}</strong>${parts ? ` （${w.word}）` : ""}</div>
     <div class="explain-row">
       <span class="explain-label">定義</span>
       <span>${w.definition}<br><span class="ja">${w.definitionJa}</span></span>
     </div>
+    ${sentenceJaHTML}
     <div class="explain-row">
       <span class="explain-label">使い方</span>
       <span>${w.usageNote}</span>
